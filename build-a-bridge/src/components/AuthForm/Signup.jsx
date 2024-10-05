@@ -13,155 +13,170 @@ import {
   Text
 } from '@chakra-ui/react';
 import { FaGoogle, FaApple, FaFacebook, FaEye, FaEyeSlash } from 'react-icons/fa';
-import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, OAuthProvider } from 'firebase/auth';
-import { auth } from '../../firebase/firebase';  // Import the Firebase auth instance
+import { signUp } from '../../firebase/auth';
 
 const SignUpForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');  // To store error messages
+  const [errorMessage, setErrorMessage] = useState('');
 
   const toggleShowPassword = () => setShowPassword(!showPassword);
 
-  // Handle email/password sign-up
   const handleSignUp = async () => {
+    setErrorMessage('');
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      console.log("User created:", userCredential.user);
-      setErrorMessage('');  // Clear any previous error messages on successful sign-up
+      const userCredential = await signUp(email, password);
+      console.log("User created:", userCredential);
     } catch (error) {
-      if (error.code === 'auth/email-already-in-use') {
-        setErrorMessage('This email is already signed up. Please log in.');
-      } else {
-        setErrorMessage(error.message);
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          setErrorMessage('This email is already signed up. Please log in.');
+          break;
+        case 'auth/invalid-email':
+          setErrorMessage('The email address is not valid.');
+          break;
+        case 'auth/weak-password':
+          setErrorMessage('Password is too weak.');
+          break;
+        default:
+          setErrorMessage('Sign-up failed. Please try again.');
       }
     }
   };
 
-  // Handle Google sign-up
-  const handleGoogleSignUp = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
-      console.log("Google user:", result.user);
-      setErrorMessage('');  // Clear error messages after successful sign-in
-    } catch (error) {
-      setErrorMessage(error.message);
-    }
-  };
-
-  // Handle Facebook sign-up
-  const handleFacebookSignUp = async () => {
-    const provider = new FacebookAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
-      console.log("Facebook user:", result.user);
-      setErrorMessage('');  // Clear error messages after successful sign-in
-    } catch (error) {
-      setErrorMessage(error.message);
-    }
-  };
-
-  // Handle Apple sign-up
-  const handleAppleSignUp = async () => {
-    const provider = new OAuthProvider('apple.com');
-    try {
-      const result = await signInWithPopup(auth, provider);
-      console.log("Apple user:", result.user);
-      setErrorMessage('');  // Clear error messages after successful sign-in
-    } catch (error) {
-      setErrorMessage(error.message);
-    }
-  };
-
   return (
-    <Box
-      p={6}
-      w="md"
-      h="auto"
-      bgGradient="linear(to-r, Yellow.500, pink.600, purple.600)"
-      borderRadius="lg"
-      boxShadow="lg"
-    >
-      <Stack spacing={4}>
-        {/* Display error message (e.g., Already signed up) */}
-        {errorMessage && (
-          <Center>
-            <Text color="red.500" fontWeight="bold">{errorMessage}</Text>
-          </Center>
-        )}
-
-        {/* Username Input */}
-        <FormControl id="username">
-          <Input
-            type="text"
-            placeholder="Username"
-            bg="white"
-            color="black"
-            _placeholder={{ color: 'gray.500' }}
-            _focus={{ borderColor: 'blue.500' }}
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </FormControl>
-
-        {/* Email Input */}
-        <FormControl id="email">
-          <Input
-            type="email"
-            placeholder="Email"
-            bg="white"
-            color="black"
-            _placeholder={{ color: 'gray.500' }}
-            _focus={{ borderColor: 'blue.500' }}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </FormControl>
-
-        {/* Password Input with Show Password */}
-        <FormControl id="password">
-          <InputGroup>
-            <Input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              bg="white"
-              color="black"
-              _placeholder={{ color: 'gray.500' }}
-              _focus={{ borderColor: 'blue.500' }}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <InputRightElement>
-              <IconButton
-                icon={showPassword ? <FaEyeSlash color="black" /> : <FaEye color="black" />}
-                onClick={toggleShowPassword}
-                variant="ghost"
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              />
-            </InputRightElement>
-          </InputGroup>
-        </FormControl>
-
+    <Center h="20h" bg="gray.50">
+      <Box
+        p={8}
+        w="400px"
+        bg="white"
+        borderRadius="20px"
+        boxShadow="0 4px 12px rgba(0, 0, 0, 0.1)"
+      >
         <Stack spacing={6}>
-          <Button bg="blue.400" color="white" _hover={{ bg: 'blue.500' }} onClick={handleSignUp}>
-            Sign Up
-          </Button>
-        </Stack>
+          <Text fontSize="2xl" fontWeight="bold" textAlign="center" color="gray.700">
+            Create an Account
+          </Text>
 
-        {/* Social Media Sign Up */}
-        <Center>
-          <HStack spacing={4}>
-            <IconButton icon={<FaGoogle />} aria-label="Google Sign-in" variant="outline" colorScheme="gray" onClick={handleGoogleSignUp} />
-            <IconButton icon={<FaFacebook />} aria-label="Facebook Sign-in" variant="outline" colorScheme="gray" onClick={handleFacebookSignUp} />
-            <IconButton icon={<FaApple />} aria-label="Apple Sign-in" variant="outline" colorScheme="gray" onClick={handleAppleSignUp} />
-          </HStack>
-        </Center>
-      </Stack>
-    </Box>
+          {errorMessage && (
+            <Center>
+              <Text color="red.500" fontWeight="bold">{errorMessage}</Text>
+            </Center>
+          )}
+
+          {/* Username Input */}
+          <FormControl id="username">
+            <Input
+              type="text"
+              placeholder="Username"
+              bg="gray.100"
+              borderRadius="full"
+              color="gray.700"
+              _placeholder={{ color: 'gray.500' }}
+              _focus={{ borderColor: 'blue.400', boxShadow: '0 0 0 2px rgba(66, 153, 225, 0.6)' }}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              p={6}
+            />
+          </FormControl>
+
+          {/* Email Input */}
+          <FormControl id="email">
+            <Input
+              type="email"
+              placeholder="Email"
+              bg="gray.100"
+              borderRadius="full"
+              color="gray.700"
+              _placeholder={{ color: 'gray.500' }}
+              _focus={{ borderColor: 'blue.400', boxShadow: '0 0 0 2px rgba(66, 153, 225, 0.6)' }}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              p={6}
+            />
+          </FormControl>
+
+          {/* Password Input */}
+          <FormControl id="password">
+            <InputGroup>
+              <Input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                bg="gray.100"
+                borderRadius="full"
+                color="gray.700"
+                _placeholder={{ color: 'gray.500' }}
+                _focus={{ borderColor: 'blue.400', boxShadow: '0 0 0 2px rgba(66, 153, 225, 0.6)' }}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                p={6}
+              />
+              <InputRightElement width="4.5rem">
+                <IconButton
+                  icon={showPassword ? <FaEyeSlash color="gray.500" /> : <FaEye color="gray.500" />}
+                  onClick={toggleShowPassword}
+                  variant="ghost"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  borderRadius="full"
+                  _hover={{ bg: 'transparent' }}
+                />
+              </InputRightElement>
+            </InputGroup>
+          </FormControl>
+
+          <Stack spacing={6}>
+            <Button
+              bg="blue.400"
+              color="white"
+              borderRadius="full"
+              py={6}
+              _hover={{ bg: 'blue.500' }}
+              _active={{ bg: 'blue.600' }}
+              onClick={handleSignUp}
+              boxShadow="0 4px 12px rgba(0, 0, 0, 0.1)"
+            >
+              Sign Up
+            </Button>
+          </Stack>
+
+          {/* Social Media Sign Up */}
+          <Center>
+            <HStack spacing={4}>
+              <IconButton
+                icon={<FaGoogle />}
+                aria-label="Google Sign-in"
+                variant="outline"
+                borderRadius="full"
+                p={4}
+                color="gray.500"
+                _hover={{ color: 'blue.400', borderColor: 'blue.400' }}
+              />
+              <IconButton
+                icon={<FaFacebook />}
+                aria-label="Facebook Sign-in"
+                variant="outline"
+                borderRadius="full"
+                p={4}
+                color="gray.500"
+                _hover={{ color: 'blue.400', borderColor: 'blue.400' }}
+              />
+              <IconButton
+                icon={<FaApple />}
+                aria-label="Apple Sign-in"
+                variant="outline"
+                borderRadius="full"
+                p={4}
+                color="gray.500"
+                _hover={{ color: 'blue.400', borderColor: 'blue.400' }}
+              />
+            </HStack>
+          </Center>
+        </Stack>
+      </Box>
+    </Center>
   );
-}
+};
 
 export default SignUpForm;

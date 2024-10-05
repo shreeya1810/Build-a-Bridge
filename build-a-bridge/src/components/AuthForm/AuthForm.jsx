@@ -15,7 +15,7 @@ import {
 } from '@chakra-ui/react';
 import { FaGoogle, FaApple, FaFacebook, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../firebase/firebase'; // Adjust the path according to your project structure
+import { auth } from '../../firebase/firebase';
 
 const AuthForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -26,18 +26,19 @@ const AuthForm = () => {
   const toggleShowPassword = () => setShowPassword(!showPassword);
 
   const handleLogin = async () => {
-    setErrorMessage(''); // Reset error message
+    setErrorMessage('');
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      // Successful login; you can redirect to homepage here if needed
-      console.log('Login successful');
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log('Login successful:', userCredential.user);
     } catch (error) {
-      console.log(error.code);
-      // Check if the error is related to a wrong password or user not found
-      if (error.code === 'auth/invalid-credential') {
+      if (error.code === 'auth/wrong-password') {
         setErrorMessage('Wrong password. Please try again.');
-      } else if (error.code === 'auth/invalid-email') {
+      } else if (error.code === 'auth/user-not-found') {
         setErrorMessage('No account found with this email.');
+      } else if (error.code === 'auth/invalid-email') {
+        setErrorMessage('Invalid email format.');
+      } else if (error.code === 'auth/too-many-requests') {
+        setErrorMessage('Too many failed login attempts. Try again later.');
       } else {
         setErrorMessage('Login failed. Please try again.');
       }
@@ -45,82 +46,130 @@ const AuthForm = () => {
   };
 
   return (
-    <Box
-      p={6}
-      w="md"
-      h="auto"
-      bgGradient="linear(to-r, Yellow.500, pink.600, purple.600)"  // Gradient for the auth box
-      borderRadius="lg"
-      boxShadow="lg"
-    >
-      <Stack spacing={4}>
-        {/* Display error message */}
-        {errorMessage && (
-          <Center>
-            <Text color="white" fontWeight="regular">{errorMessage}</Text>
-          </Center>
-        )}
-
-        {/* Email Input */}
-        <FormControl id="email">
-          <InputGroup>
-            <Input
-              type="email"
-              placeholder="Email or Username"
-              bg="white"
-              color="black"
-              _placeholder={{ color: 'gray.500' }}
-              _focus={{ borderColor: 'blue.500' }}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)} // Update email state
-            />
-          </InputGroup>
-        </FormControl>
-
-        {/* Password Input with Show Password */}
-        <FormControl id="password">
-          <InputGroup>
-            <Input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              bg="white"
-              color="black"
-              _placeholder={{ color: 'gray.500' }}
-              _focus={{ borderColor: 'blue.500' }}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)} // Update password state
-            />
-            <InputRightElement>
-              <IconButton
-                icon={showPassword ? <FaEyeSlash color="black" /> : <FaEye color="black" />}
-                onClick={toggleShowPassword}
-                variant="ghost"
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              />
-            </InputRightElement>
-          </InputGroup>
-        </FormControl>
-
+    <Center h="20h" bg="gray.50">
+      <Box
+        p={8}
+        w="400px"
+        borderRadius="20px"
+        boxShadow="0 4px 12px rgba(0, 0, 0, 0.1)"
+        backgroundImage="url('scenery.png')" // Background image URL or import
+        backgroundSize="cover"
+        backgroundPosition="center"
+      >
         <Stack spacing={6}>
-          <Button bg="blue.400" color="white" _hover={{ bg: 'blue.500' }} onClick={handleLogin}>
-            Login
-          </Button>
+          <Text fontSize="2xl" fontWeight="bold" textAlign="center" color="gray.700">
+            Login to Your Account
+          </Text>
+
+          {/* Display error message */}
+          {errorMessage && (
+            <Center>
+              <Text color="red.500" fontWeight="bold">{errorMessage}</Text>
+            </Center>
+          )}
+
+          {/* Email Input */}
+          <FormControl id="email">
+            <InputGroup>
+              <Input
+                type="email"
+                placeholder="Email"
+                bg="gray.100"
+                borderRadius="full"
+                color="gray.700"
+                _placeholder={{ color: 'gray.500' }}
+                _focus={{ borderColor: 'blue.400', boxShadow: '0 0 0 2px rgba(66, 153, 225, 0.6)' }}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                p={6}
+              />
+            </InputGroup>
+          </FormControl>
+
+          {/* Password Input with Show Password */}
+          <FormControl id="password">
+            <InputGroup>
+              <Input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Password"
+                bg="gray.100"
+                borderRadius="full"
+                color="gray.700"
+                _placeholder={{ color: 'gray.500' }}
+                _focus={{ borderColor: 'blue.400', boxShadow: '0 0 0 2px rgba(66, 153, 225, 0.6)' }}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                p={6}
+              />
+              <InputRightElement width="4.5rem">
+                <IconButton
+                  icon={showPassword ? <FaEyeSlash color="gray.500" /> : <FaEye color="gray.500" />}
+                  onClick={toggleShowPassword}
+                  variant="ghost"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  borderRadius="full"
+                  _hover={{ bg: 'transparent' }}
+                />
+              </InputRightElement>
+            </InputGroup>
+          </FormControl>
+
+          <Stack spacing={6}>
+            <Button
+              bg="blue.400"
+              color="white"
+              borderRadius="full"
+              py={6}
+              _hover={{ bg: 'blue.500' }}
+              _active={{ bg: 'blue.600' }}
+              onClick={handleLogin}
+              boxShadow="0 4px 12px rgba(0, 0, 0, 0.1)"
+            >
+              Login
+            </Button>
+            <Center>
+              <Link color="blue.400" fontWeight="bold" _hover={{ textDecoration: 'underline' }}>
+                Forgot password?
+              </Link>
+            </Center>
+          </Stack>
+
+          {/* Social Media Sign In */}
           <Center>
-            <Link color="white" fontWeight="bold">Forgot password?</Link>
+            <HStack spacing={4}>
+              <IconButton
+                icon={<FaGoogle />}
+                aria-label="Google Sign-in"
+                variant="outline"
+                borderRadius="full"
+                p={4}
+                color="gray.500"
+                _hover={{ color: 'blue.400', borderColor: 'blue.400' }}
+              />
+              <IconButton
+                icon={<FaFacebook />}
+                aria-label="Facebook Sign-in"
+                variant="outline"
+                borderRadius="full"
+                p={4}
+                color="gray.500"
+                _hover={{ color: 'blue.400', borderColor: 'blue.400' }}
+              />
+              <IconButton
+                icon={<FaApple />}
+                aria-label="Apple Sign-in"
+                variant="outline"
+                borderRadius="full"
+                p={4}
+                color="gray.500"
+                _hover={{ color: 'blue.400', borderColor: 'blue.400' }}
+              />
+            </HStack>
           </Center>
         </Stack>
-
-        {/* Social Media Sign In */}
-        <Center>
-          <HStack spacing={4}>
-            <IconButton icon={<FaGoogle />} aria-label="Google Sign-in" variant="outline" colorScheme="gray" />
-            <IconButton icon={<FaFacebook />} aria-label="Facebook Sign-in" variant="outline" colorScheme="gray" />
-            <IconButton icon={<FaApple />} aria-label="Apple Sign-in" variant="outline" colorScheme="gray" />
-          </HStack>
-        </Center>
-      </Stack>
-    </Box>
+      </Box>
+    </Center>
   );
-}
+};
 
 export default AuthForm;

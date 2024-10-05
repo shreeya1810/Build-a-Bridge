@@ -2,9 +2,14 @@ import { useState } from "react";
 import { Container, Flex, Box, Image, Text } from "@chakra-ui/react";
 import AuthForm from "../../components/AuthForm/AuthForm";  // Login form
 import SignUpForm from "../../components/AuthForm/Signup";  // Signup form
+import { motion } from "framer-motion"; // Import motion from Framer Motion
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true); // State to toggle between login and signup
+
+  const handleToggle = () => {
+    setIsLogin(!isLogin);
+  };
 
   return (
     <Box
@@ -25,13 +30,37 @@ const AuthPage = () => {
           {/* Logo */}
           <Image src="logo.png" alt="Build A Bridge Logo" boxSize="150px" mb={8} />
 
-          {/* Conditional rendering of AuthForm or SignUpForm */}
-          {isLogin ? <AuthForm /> : <SignUpForm />}
+          {/* Conditional rendering with smooth transitions */}
+          <motion.div
+            key={isLogin ? "login" : "signup"}
+            initial={{ opacity: 0, x: isLogin ? -100 : 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: isLogin ? 100 : -100 }}
+            transition={{ duration: 0.5 }}
+          >
+            {isLogin ? <AuthForm /> : <SignUpForm />}
+          </motion.div>
 
-          {/* Move sign-up and login text outside the box */}
-          <Text mt={4} fontWeight="bold" color="white" textAlign="center" onClick={() => setIsLogin(!isLogin)} cursor="pointer">
-            {isLogin ? "Don't have an account? Sign up" : "Already have an account? Log in"}
-          </Text>
+          {/* Smooth transition for toggle text */}
+          <motion.div
+            key={isLogin ? "switch-to-signup" : "switch-to-login"}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Text
+              mt={4}
+              fontWeight="bold"
+              color="white"
+              textAlign="center"
+              onClick={handleToggle}
+              cursor="pointer"
+              _hover={{ textDecoration: "underline" }}
+            >
+              {isLogin ? "Don't have an account? Sign up" : "Already have an account? Log in"}
+            </Text>
+          </motion.div>
         </Flex>
       </Container>
     </Box>
