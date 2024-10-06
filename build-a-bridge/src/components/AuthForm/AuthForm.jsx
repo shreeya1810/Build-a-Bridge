@@ -12,6 +12,7 @@ import {
   IconButton,
   HStack,
   Text,
+  useColorModeValue, // Import useColorModeValue
 } from '@chakra-ui/react';
 import { FaGoogle, FaApple, FaFacebook, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { signInWithEmailAndPassword } from 'firebase/auth';
@@ -30,7 +31,10 @@ const AuthForm = () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       console.log('Login successful:', userCredential.user);
+      // Handle successful login (e.g., redirect, update UI)
     } catch (error) {
+      console.log(error.code);
+      console.log(error.message);
       if (error.code === 'auth/wrong-password') {
         setErrorMessage('Wrong password. Please try again.');
       } else if (error.code === 'auth/user-not-found') {
@@ -46,18 +50,16 @@ const AuthForm = () => {
   };
 
   return (
-    <Center h="20h" bg="gray.50">
+    <Center h="60vh" bg={useColorModeValue('gray.50', 'gray.800')} borderRadius="20px" boxShadow="0 4px 12px rgba(0, 0, 0, 0.1)">
       <Box
         p={8}
         w="400px"
         borderRadius="20px"
-        boxShadow="0 4px 12px rgba(0, 0, 0, 0.1)"
-        backgroundImage="url('scenery.png')" // Background image URL or import
-        backgroundSize="cover"
         backgroundPosition="center"
+        bg={useColorModeValue('gray.50', 'gray.800')} // Set background color based on the color mode
       >
         <Stack spacing={6}>
-          <Text fontSize="2xl" fontWeight="bold" textAlign="center" color="gray.700">
+          <Text fontSize="2xl" fontWeight="bold" textAlign="center" color={useColorModeValue('gray.700', 'white')}>
             Login to Your Account
           </Text>
 
@@ -76,7 +78,7 @@ const AuthForm = () => {
                 placeholder="Email"
                 bg="gray.100"
                 borderRadius="full"
-                color="gray.700"
+                bg={useColorModeValue('gray.100', 'gray.600')}
                 _placeholder={{ color: 'gray.500' }}
                 _focus={{ borderColor: 'blue.400', boxShadow: '0 0 0 2px rgba(66, 153, 225, 0.6)' }}
                 value={email}
@@ -94,7 +96,7 @@ const AuthForm = () => {
                 placeholder="Password"
                 bg="gray.100"
                 borderRadius="full"
-                color="gray.700"
+                bg={useColorModeValue('gray.100', 'gray.600')}
                 _placeholder={{ color: 'gray.500' }}
                 _focus={{ borderColor: 'blue.400', boxShadow: '0 0 0 2px rgba(66, 153, 225, 0.6)' }}
                 value={password}

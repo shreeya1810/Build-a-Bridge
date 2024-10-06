@@ -3,8 +3,15 @@ import { Container, Flex, Box, Image, Text } from "@chakra-ui/react";
 import AuthForm from "../../components/AuthForm/AuthForm";  // Login form
 import SignUpForm from "../../components/AuthForm/Signup";  // Signup form
 import { motion } from "framer-motion"; // Import motion from Framer Motion
+import {useColorMode,
+  useColorModeValue,
+} from '@chakra-ui/react';
 
 const AuthPage = () => {
+  const lightGradient = 'linear(to-r, blue.400, pink.500, purple.600)';
+  const darkGradient = 'linear(to-r, blue.500, pink.600, purple.500)';
+  const backgroundGradient = useColorModeValue(lightGradient, darkGradient);
+
   const [isLogin, setIsLogin] = useState(true); // State to toggle between login and signup
 
   const handleToggle = () => {
@@ -14,7 +21,7 @@ const AuthPage = () => {
   return (
     <Box
       minH="100vh"
-      bgGradient="linear(to-r, yellow.400, pink.500, purple.600, pink.500)"  // Gradient for the page
+      bgGradient={backgroundGradient}  // Gradient for the page
       animation="gradient 8s ease infinite"
       backgroundSize="300% 300%"  // Gradient animation
       sx={{

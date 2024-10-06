@@ -10,17 +10,22 @@ import {
   InputRightElement,
   IconButton,
   HStack,
-  Text
+  Text,
+  useColorMode,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import { FaGoogle, FaApple, FaFacebook, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { signUp } from '../../firebase/auth';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for routing
 
 const SignUpForm = () => {
+  const { colorMode } = useColorMode(); // Get the current color mode
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate(); // Initialize navigate function
 
   const toggleShowPassword = () => setShowPassword(!showPassword);
 
@@ -29,6 +34,9 @@ const SignUpForm = () => {
     try {
       const userCredential = await signUp(email, password);
       console.log("User created:", userCredential);
+      
+      // Redirect to profile page after sign-up
+      navigate('/profile-creation'); // Assuming '/profile' is your profile route
     } catch (error) {
       switch (error.code) {
         case 'auth/email-already-in-use':
@@ -47,16 +55,15 @@ const SignUpForm = () => {
   };
 
   return (
-    <Center h="20h" bg="gray.50">
+    <Center h="65vh" bg={useColorModeValue('gray.50', 'gray.800')} borderRadius="20px" boxShadow="0 4px 12px rgba(0, 0, 0, 0.1)"> {/* Background changes with color mode */}
       <Box
         p={8}
-        w="400px"
-        bg="white"
+        w="450px"
+        bg={useColorModeValue('gray.50', 'gray.800')} // Change background for dark mode
         borderRadius="20px"
-        boxShadow="0 4px 12px rgba(0, 0, 0, 0.1)"
       >
         <Stack spacing={6}>
-          <Text fontSize="2xl" fontWeight="bold" textAlign="center" color="gray.700">
+          <Text fontSize="2xl" fontWeight="bold" textAlign="center" color={useColorModeValue('gray.700', 'white')}>
             Create an Account
           </Text>
 
@@ -71,9 +78,9 @@ const SignUpForm = () => {
             <Input
               type="text"
               placeholder="Username"
-              bg="gray.100"
+              bg={useColorModeValue('gray.100', 'gray.600')} // Input background based on color mode
               borderRadius="full"
-              color="gray.700"
+              color={useColorModeValue('gray.700', 'white')} // Input text color based on color mode
               _placeholder={{ color: 'gray.500' }}
               _focus={{ borderColor: 'blue.400', boxShadow: '0 0 0 2px rgba(66, 153, 225, 0.6)' }}
               value={username}
@@ -87,9 +94,9 @@ const SignUpForm = () => {
             <Input
               type="email"
               placeholder="Email"
-              bg="gray.100"
+              bg={useColorModeValue('gray.100', 'gray.600')} // Input background based on color mode
               borderRadius="full"
-              color="gray.700"
+              color={useColorModeValue('gray.700', 'white')} // Input text color based on color mode
               _placeholder={{ color: 'gray.500' }}
               _focus={{ borderColor: 'blue.400', boxShadow: '0 0 0 2px rgba(66, 153, 225, 0.6)' }}
               value={email}
@@ -104,9 +111,9 @@ const SignUpForm = () => {
               <Input
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
-                bg="gray.100"
+                bg={useColorModeValue('gray.100', 'gray.600')} // Input background based on color mode
                 borderRadius="full"
-                color="gray.700"
+                color={useColorModeValue('gray.700', 'white')} // Input text color based on color mode
                 _placeholder={{ color: 'gray.500' }}
                 _focus={{ borderColor: 'blue.400', boxShadow: '0 0 0 2px rgba(66, 153, 225, 0.6)' }}
                 value={password}
